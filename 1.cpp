@@ -1,31 +1,22 @@
+#include <algorithm>
+#include <cmath>
+#include <functional>
 #include <iostream>
 #include <list>
 #include <queue>
 #include <tuple>
 #include <vector>
-// #define MAX_INT 0x7fffffff
+#undef INT_MAX
+#define INT_MAX 0x7fffffff
+
 struct Point {
   int x;
   int y;
 
-  int dist(const Point& point) const {
-    return std::abs(point.x - x) + std::abs(point.y - y);
+  int distance(const Point& point) {
+    return std::min(std::abs(x - point.x), std::abs(y - point.y));
   }
-};
-
-template <typename T>
-class WeightedGraph {
-   std::vector<std::list<std::tuple<int, int>>> edges;
-
- public:
-  WeightedGraph(int length) {
-    weights.resize(length);
-    std::fill(weights.begin(), weights.end(), MAX_INT);
-  }
-
-  int insert(const T& node) { nodes.push_back(node); }
-  int connect(int nodeIndex, int nodeIndex) {}
-  find() { std::priority_queue queue(); }
+  Point() { std::cin >> x >> y; }
 };
 
 int main() {
@@ -36,10 +27,75 @@ int main() {
   int n;
   std::cin >> n;
 
+  std::vector<Point> points(n);
+  std::vector<std::vector<std::tuple<int, short>>> edges(n);
+
   for (auto i = 0; i < n; i++) {
-    int x, y;
-    std::cin >> x >> y;
+    std::vector<std::tuple<int, short>> vertexEdges;
+    vertexEdges.reserve(i);
+
+    for (auto j = 0; j < i; j++) {
+      if (edges[j].size() < 4) {
+        vertexEdges.push_back(
+            std::make_tuple<int, short>(points[i].distance(points[j]), j));
+      }
+    }
+
+    std::nth_element(vertexEdges.begin(), vertexEdges.begin() + 3,
+                     vertexEdges.end());
+    vertexEdges.resize(std::min<int>(4, vertexEdges.size()));
+
+    for (auto& edge : vertexEdges) {
+      short j;
+      int distance;
+      std::tie(distance, j) = edge;
+      edges[j].push_back(std::make_tuple(distance, i));
+    }
+
+    edges[i].swap(vertexEdges);
   }
+
   int s, d;
-  std::cin >> s, d;
+  std::cin >> s >> d;
+
+  std::vector<int> distances(n, INT_MAX);
+  distances[s] = 0;
+
+  std::priority_queue<std::tuple<int, short>,
+                      std::vector<std::tuple<int, short>>,
+                      std::greater<std::tuple<int, short>>>
+      queue;
+
+  std::vector<bool> visited(n, false);
+
+  queue.push(std::make_tuple(0, s));
+
+  while (!queue.empty()) {
+    int fromDistance;
+    short from;
+
+    std::tie(fromDistance, from) = queue.top();
+    queue.pop();
+
+    if (visited[from]) {
+      continue;
+    }
+    visited[from] = true;
+
+    for (auto& edge : edges[from]) {
+      int distance;
+      short to;
+      std::tie(distance, to) = edge;
+
+      auto toDistance = distance + fromDistance;
+
+      if (toDistance >= distances[to]) {
+        continue;
+      }
+
+      distances[to] = toDistance;
+      queue.push(std::make_tuple(toDistance, to));
+    }
+  }
+  std::cout << distances[d];
 }
