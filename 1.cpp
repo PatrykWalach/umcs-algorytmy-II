@@ -8,15 +8,22 @@
 #include <vector>
 #undef INT_MAX
 #define INT_MAX 0x7fffffff
+#undef SHRT_MAX
+#define SHRT_MAX 0x7fff
 
 struct Point {
   int x;
   int y;
+  short i;
 
   int distance(const Point& point) {
     return std::min(std::abs(x - point.x), std::abs(y - point.y));
   }
-  Point() { std::cin >> x >> y; }
+
+  Point(short i) {
+    this->i = i;
+    std::cin >> x >> y;
+  }
 };
 
 int main() {
@@ -24,35 +31,35 @@ int main() {
   std::cin.tie(nullptr);
   std::cout.tie(nullptr);
 
-  int n;
+  short n;
   std::cin >> n;
 
-  std::vector<Point> points(n);
+  std::vector<Point*> points;
+  points.reserve(n);
   std::vector<std::vector<std::tuple<int, short>>> edges(n);
 
   for (auto i = 0; i < n; i++) {
-    std::vector<std::tuple<int, short>> vertexEdges;
-    vertexEdges.reserve(i);
+    points.push_back(new Point(i));
+  }
 
-    for (auto j = 0; j < i; j++) {
-      if (edges[j].size() < 4) {
-        vertexEdges.push_back(
-            std::make_tuple<int, short>(points[i].distance(points[j]), j));
-      }
-    }
+  std::sort(points.begin(), points.end(),
+            [](auto& a, auto& b) { return a->x < b->x; });
 
-    std::nth_element(vertexEdges.begin(), vertexEdges.begin() + 3,
-                     vertexEdges.end());
-    vertexEdges.resize(std::min<int>(4, vertexEdges.size()));
+  for (auto i = 1; i < n; i++) {
+    auto weight = points[i]->distance(*points[i - 1]);
 
-    for (auto& edge : vertexEdges) {
-      short j;
-      int distance;
-      std::tie(distance, j) = edge;
-      edges[j].push_back(std::make_tuple(distance, i));
-    }
+    edges[points[i - 1]->i].push_back(std::make_tuple(weight, points[i]->i));
+    edges[points[i]->i].push_back(std::make_tuple(weight, points[i - 1]->i));
+  }
 
-    edges[i].swap(vertexEdges);
+  std::sort(points.begin(), points.end(),
+            [](auto& a, auto& b) { return a->y < b->y; });
+
+  for (auto i = 1; i < n; i++) {
+    auto weight = points[i]->distance(*points[i - 1]);
+
+    edges[points[i - 1]->i].push_back(std::make_tuple(weight, points[i]->i));
+    edges[points[i]->i].push_back(std::make_tuple(weight, points[i - 1]->i));
   }
 
   int s, d;
