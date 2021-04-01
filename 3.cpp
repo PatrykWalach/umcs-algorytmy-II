@@ -138,7 +138,8 @@ class Map {
       node->color = Node::Color_BLACK;
 
       return;
-    } else if (node->key < parent->key) {
+    }
+    if (node->key < parent->key) {
       parent->left = node;
     } else {
       parent->right = node;
