@@ -2,6 +2,8 @@
 #include <cmath>
 #include <functional>
 #include <iostream>
+#include <iterator>
+#include <list>
 #include <queue>
 #include <set>
 #include <tuple>
@@ -11,102 +13,88 @@
 #undef SHRT_MAX
 #define SHRT_MAX 0x7fff
 
+std::vector<int> pairs;
+std::vector<bool> visited;
+std::vector<std::list<int>> edges;
+
+bool kuhn(int v) {
+  if (visited[v]) {
+    return false;
+  }
+
+  visited[v] = true;
+  for (auto& to : edges[v]) {
+    if (pairs[to] != -1 && !kuhn(pairs[to])) {
+      continue;
+    }
+    pairs[to] = v;
+    return true;
+  }
+
+  return false;
+};
+
 int main() {
   std::ios_base::sync_with_stdio(false);
   std::cin.tie(nullptr);
   std::cout.tie(nullptr);
 
-  short n;
+  int n;
   std::cin >> n;
 
-  std::vector<short> vertecies(n * n);
-  std::vector<std::vector<int>> edges(n * n);
+  std::vector<short> verticies;
+  verticies.reserve(n * n);
+  edges.resize(n * n);
 
   for (auto i = 0; i < n * n; i++) {
-    std::cin >> vertecies[i];
+    short v;
+    std::cin >> v;
+    verticies.push_back(v);
   }
 
-  for (auto k = 0; k < n * n; k++) {
-    if (vertecies[k] == 0) {
-      continue;
-    }
+  std::vector<short> VERTEX_TO_D1 = {SHRT_MAX, 3, 1, 1};
+  std::vector<short> VERTEX_TO_D2 = {SHRT_MAX, 2, 0, 2};
 
-    auto y1 = (((vertecies[k] / 2 + 1) % 2) * 2 + 1) * ((k % 2) * -2 + 1);
-
-    if (std::floor((float)(k + y1) / (float)n) == k / n &&
-        vertecies[k + y1] != 0) {
-      edges[k].push_back(k + y1);
-      edges[k + y1].push_back(k);
-    }
-
-    auto y2 = (vertecies[k] % 2) * 2 * ((k % 2) * -2 + 1);
-
-    if (std::floor((float)(k + y2) / (float)n) != k / n) {
-      continue;
-    }
-
-    if (k + n < n * n && vertecies[k + n + y2] != 0) {
-      edges[k].push_back(k + n + y2);
-      edges[k + n + y2].push_back(k);
-    }
-
-    if (k - n >= 0 && vertecies[k - n + y2] != 0) {
-      edges[k].push_back(k - n + y2);
-      edges[k - n + y2].push_back(k);
-    }
-  }
-
-  std::vector<int> pairs(n * n, -1);
-  std::vector<int> parents(n * n);
-
-  for (auto i = 0; i < n * n; i += 2) {
-    if (pairs[i] != -1) {
-      continue;
-    }
-
-    std::vector<int> visited(n * n, false);
-    std::queue<int> queue;
-
-    visited[i] = true;
-    parents[i] = -1;
-    queue.push(i);
-
-    while (!queue.empty()) {
-      auto j = queue.front();
-      queue.pop();
-
-      if (j % 2 != 0) {
-        if (pairs[j] == -1) {
-          while (parents[j] != -1) {
-            if (j % 2 != 0) {
-              pairs[j] = parents[j];
-              pairs[parents[j]] = j;
-            }
-            j = parents[j];
-          }
-          break;
-        }
-        parents[pairs[j]] = j;
-        visited[pairs[j]] = true;
-        queue.push(pairs[j]);
+  for (auto i = 0; i < n; i++) {
+    for (auto j = i % 2; j < n; j += 2) {
+      auto k = i * n + j;
+      if (verticies[k] == 0) {
         continue;
       }
 
-      for (auto& edge : edges[j]) {
-        if (visited[edge]) {
-          continue;
-        }
-        visited[edge] = true;
-        parents[edge] = j;
-        queue.push(edge);
+      auto d1 = VERTEX_TO_D1[verticies[k]];
+
+      if (std::floor((float)(k + d1) / (float)n) == i &&
+          verticies[k + d1] != 0) {
+        edges[k].push_back(k + d1);
+      }
+
+      auto d2 = VERTEX_TO_D2[verticies[k]];
+
+      if (std::floor((float)(k + d2) / (float)n) != i) {
+        continue;
+      }
+
+      if (k + n < n * n && verticies[k + n + d2] != 0) {
+        edges[k].push_back(k + n + d2);
+      }
+
+      if (k - n >= 0 && verticies[k - n + d2] != 0) {
+        edges[k].push_back(k - n + d2);
       }
     }
   }
 
+  pairs.assign(n * n, -1);
+
   int r = 0;
-  for (int i = 1; i < n * n; i += 2) {
-    if (pairs[i] != -1) {
-      r++;
+  for (auto i = 0; i < n; i++) {
+    for (auto j = i % 2; j < n; j += 2) {
+      auto k = i * n + j;
+      visited.assign(n * n, false);
+      if (kuhn(k)) {
+        r++;
+      }
     }
   }
 
