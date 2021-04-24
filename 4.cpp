@@ -122,8 +122,7 @@ int main() {
   std::cin.tie(nullptr);
   std::cout.tie(nullptr);
 
-  BTree<std::string, std::string> m(15);
-
+  BTree<std::string, std::string> m(41);
   int n;
   std::cin >> n;
   std::cin.ignore();
