@@ -93,7 +93,7 @@ class BTree {
     std::advance(middleIt, children.size() / 2);
     auto middle = *middleIt;
 
-    middle->next = new Leaf(_end);
+    middle->next = new Leaf(middle->next);
     middle->next->children.splice(middle->next->children.begin(), children,
                                   children.begin(), middleIt);
 
