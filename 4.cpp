@@ -65,6 +65,10 @@ class BTree {
   bool _insert(Leaf* leaf, Node* node) {
     auto it = _shallowFind(leaf, node->key);
 
+    if (it != leaf->children.end() && (*it)->key == node->key) {
+      (*it)->value = node->value;
+      return true;
+    }
     auto& next = it != leaf->children.end() ? (*it)->next : leaf->next;
 
     if (next == _end) {
