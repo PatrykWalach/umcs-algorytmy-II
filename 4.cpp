@@ -1,6 +1,8 @@
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
 #include <list>
+#include <queue>
 #include <sstream>
 #include <string>
 
@@ -69,6 +71,7 @@ class BTree {
       (*it)->value = node->value;
       return true;
     }
+
     auto& next = it != leaf->children.end() ? (*it)->next : leaf->next;
 
     if (next == _end) {
@@ -147,7 +150,6 @@ int main() {
 
     auto definition = m.find(key);
 
-    std::cout << (definition == nullptr ? "BRAK" : definition->value)
-              << '\n';
+    std::cout << (definition == nullptr ? "BRAK" : definition->value) << '\n';
   }
 }
