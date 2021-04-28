@@ -42,9 +42,7 @@ class BTree {
       return nullptr;
     }
 
-    auto it =
-        std::lower_bound(leaf->children.begin(), leaf->children.end(), key,
-                         [](auto& a, auto& b) { return a->key < b; });
+    auto it = _shallowFind(leaf, key);
 
     if (it == leaf->children.end()) {
       return _find(leaf->next, key);
@@ -58,10 +56,14 @@ class BTree {
     return _find(child->next, key);
   }
 
+  typename std::list<Node*>::iterator _shallowFind(Leaf* leaf, Key& key) {
+    return std::lower_bound(
+        leaf->children.begin(), leaf->children.end(), key,
+        [](auto& node, auto& key) { return node->key < key; });
+  }
+
   bool _insert(Leaf* leaf, Node* node) {
-    auto it =
-        std::lower_bound(leaf->children.begin(), leaf->children.end(), node,
-                         [](auto& a, auto& b) { return a->key < b->key; });
+    auto it = _shallowFind(leaf, node->key);
 
     auto& next = it != leaf->children.end() ? (*it)->next : leaf->next;
 
