@@ -105,8 +105,6 @@ class BTree {
 
     parentLeaf->children.splice(it, children, middleIt);
 
-    std::advance(it, 1);
-
     if (it == parentLeaf->children.end()) {
       parentLeaf->next = leaf;
     } else {
