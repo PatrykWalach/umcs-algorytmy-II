@@ -148,6 +148,6 @@ int main() {
     auto definition = m.find(key);
 
     std::cout << (definition == nullptr ? "BRAK" : definition->value)
-              << std::endl;
+              << '\n';
   }
 }
