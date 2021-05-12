@@ -14,7 +14,7 @@
 
 #include <cmath>
 
-std::vector<int> rabin_karp(const std::vector<short>& sequence,
+std::vector<int> rabinKarp(const std::vector<short>& sequence,
                             const std::vector<short>& search) {
   const int p = 101;
   const int m = 1e9 + 9;
@@ -25,28 +25,32 @@ std::vector<int> rabin_karp(const std::vector<short>& sequence,
     p_pow[i] = (p_pow[i - 1] * p) % m;
   }
 
-  std::vector<long long> h(sequence.size() + 1, 0);
+  std::vector<long long> hashed_sequence(sequence.size() + 1, 0);
   for (int i = 0; i < sequence.size(); i++) {
-    h[i + 1] = (h[i] + (sequence[i] + 1) * p_pow[i]) % m;
+    hashed_sequence[i + 1] =
+        (hashed_sequence[i] + (sequence[i] + 1) * p_pow[i]) % m;
   }
 
-  long long h_s = 0;
+  long long hashed_search = 0;
   for (int i = 0; i < search.size(); i++) {
-    h_s = (h_s + (search[i] + 1) * p_pow[i]) % m;
+    hashed_search = (hashed_search + (search[i] + 1) * p_pow[i]) % m;
   }
 
-  std::vector<int> occurences;
+  std::vector<int> occurrences;
 
-  for (int i = sequence.size() - search.size(); i > -1 && occurences.size() < 2;
+  for (int i = sequence.size() - search.size(); i > -1 && occurrences.size() < 2;
        i--) {
-    long long cur_h = (h[i + search.size()] + m - h[i]) % m;
+    long long cur_h =
+        (hashed_sequence[i + search.size()] + m - hashed_sequence[i]) % m;
 
-    if (cur_h == h_s * p_pow[i] % m) {
-      occurences.push_back(i);
+    if (cur_h == hashed_search * p_pow[i] % m &&
+        std::equal(sequence.begin() + i, sequence.begin() + i + search.size(),
+                   search.begin())) {
+      occurrences.push_back(i);
     }
   }
 
-  return occurences;
+  return occurrences;
 }
 
 int main() {
@@ -76,7 +80,7 @@ int main() {
     subsequence.push_back(n);
   }
 
-  auto r = rabin_karp(sequence, subsequence);
+  auto r = rabinKarp(sequence, subsequence);
 
   int i = r[1];
   int j = r[0];
