@@ -82,8 +82,12 @@ int main() {
 
   auto r = rabinKarp(sequence, subsequence);
 
-  int i = r[1];
   int j = r[0];
+  int c = r[1] + j;
 
-  std::cout << i + j - V << std::endl;
+  while (c < V) {
+    c += j;
+  }
+
+  std::cout << c - V << std::endl;
 }
