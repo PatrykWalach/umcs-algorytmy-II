@@ -32,30 +32,31 @@ void convexHull(std::vector<Point> &points) {
   up.push_back(first);
   down.push_back(first);
 
-  for (auto i = 1; i < points.size(); i++) {
-    if (i == points.size() - 1 || angle(first, points[i], last) < 0) {
+  for (auto it = points.begin() + 1; it < points.end(); it++) {
+    auto point = *it;
+
+    if (it == points.end() - 1 || angle(first, point, last) < 0) {
       while (up.size() >= 2 &&
-             angle(up[up.size() - 2], up[up.size() - 1], points[i]) >= 0) {
+             angle(up[up.size() - 2], up[up.size() - 1], point) >= 0) {
         up.pop_back();
       }
-      up.push_back(points[i]);
+      up.push_back(point);
     }
 
-    if (i == points.size() - 1 || angle(first, points[i], last) > 0) {
-      while (down.size() >= 2 && angle(down[down.size() - 2],
-                                       down[down.size() - 1], points[i]) <= 0) {
+    if (it == points.end() - 1 || angle(first, point, last) > 0) {
+      while (down.size() >= 2 &&
+             angle(down[down.size() - 2], down[down.size() - 1], point) <= 0) {
         down.pop_back();
       }
-      down.push_back(points[i]);
+      down.push_back(point);
     }
   }
+
   points.clear();
 
   points.insert(points.end(), up.begin(), up.end());
 
-  for (auto i = down.size() - 2; i > 0; i--) {
-    points.push_back(down[i]);
-  }
+  points.insert(points.end(), down.rbegin() + 1, down.rend() - 1);
 }
 
 double area(const std::vector<Point> &points) {
