@@ -44,7 +44,7 @@ class BTree {
       return nullptr;
     }
 
-    auto it = _shallowFind(leaf, key);
+    auto it = _shallow_find(leaf, key);
 
     if (it == leaf->children.end()) {
       return _find(leaf->next, key);
@@ -58,14 +58,14 @@ class BTree {
     return _find(child->next, key);
   }
 
-  typename std::list<Node*>::iterator _shallowFind(Leaf* leaf, Key& key) {
+  typename std::list<Node*>::iterator _shallow_find(Leaf* leaf, Key& key) {
     return std::lower_bound(
         leaf->children.begin(), leaf->children.end(), key,
         [](auto& node, auto& key) { return node->key < key; });
   }
 
   bool _insert(Leaf* leaf, Node* node) {
-    auto it = _shallowFind(leaf, node->key);
+    auto it = _shallow_find(leaf, node->key);
 
     if (it != leaf->children.end() && (*it)->key == node->key) {
       (*it)->value = node->value;
@@ -95,21 +95,21 @@ class BTree {
 
   Node* find(Key& key) { return _find(_begin, key); }
 
-  void _split(Leaf* parentLeaf, Leaf* leaf,
+  void _split(Leaf* parent_leaf, Leaf* leaf,
               typename std::list<Node*>::iterator it) {
     auto& children = leaf->children;
-    auto middleIt = children.begin();
-    std::advance(middleIt, children.size() / 2);
-    auto middle = *middleIt;
+    auto middle_it = children.begin();
+    std::advance(middle_it, children.size() / 2);
+    auto middle = *middle_it;
 
     middle->next = new Leaf(middle->next);
     middle->next->children.splice(middle->next->children.begin(), children,
-                                  children.begin(), middleIt);
+                                  children.begin(), middle_it);
 
-    parentLeaf->children.splice(it, children, middleIt);
+    parent_leaf->children.splice(it, children, middle_it);
 
-    if (it == parentLeaf->children.end()) {
-      parentLeaf->next = leaf;
+    if (it == parent_leaf->children.end()) {
+      parent_leaf->next = leaf;
     } else {
       (*it)->next = leaf;
     }

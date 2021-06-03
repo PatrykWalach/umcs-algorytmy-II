@@ -29,7 +29,7 @@ class Map {
                : node->parent->parent->right;
   }
 
-  void _rotateRight(Node* x) {
+  void _rotate_right(Node* x) {
     Node* y = x->left;
     x->left = y->right;
     if (y->right != _end) {
@@ -47,7 +47,7 @@ class Map {
     x->parent = y;
   }
 
-  void _rotateLeft(Node* x) {
+  void _rotate_left(Node* x) {
     Node* y = x->right;
     x->right = y->left;
     if (y->left != _end) {
@@ -65,7 +65,7 @@ class Map {
     x->parent = y;
   }
 
-  void _fixTree(Node* node) {
+  void _fix_tree(Node* node) {
     while (node != _begin && node->parent->color == Node::Color_RED) {
       Node* uncle = _uncle(node);
 
@@ -80,23 +80,23 @@ class Map {
       if (node->parent == node->parent->parent->right) {
         if (node == node->parent->left) {
           node = node->parent;
-          _rotateRight(node);
+          _rotate_right(node);
         }
 
         node->parent->color = Node::Color_BLACK;
         node->parent->parent->color = Node::Color_RED;
-        _rotateLeft(node->parent->parent);
+        _rotate_left(node->parent->parent);
         continue;
       }
 
       if (node == node->parent->right) {
         node = node->parent;
-        _rotateLeft(node);
+        _rotate_left(node);
       }
 
       node->parent->color = Node::Color_BLACK;
       node->parent->parent->color = Node::Color_RED;
-      _rotateRight(node->parent->parent);
+      _rotate_right(node->parent->parent);
     }
 
     _begin->color = Node::Color_BLACK;
@@ -149,7 +149,7 @@ class Map {
       return;
     }
 
-    _fixTree(node);
+    _fix_tree(node);
   }
 
   T& at(const Key& key) { return _at(_begin, key)->value; }
@@ -163,15 +163,15 @@ int main() {
   int n;
   std::cin >> n;
 
-  std::list<std::string> songsByFavourites;
-  Map<std::string, std::list<std::string>::iterator> songsByNames;
+  std::list<std::string> songs_by_favourites;
+  Map<std::string, std::list<std::string>::iterator> songs_by_names;
 
   for (auto i = 0; i < n; i++) {
     std::string str;
     std::cin >> str;
 
-    songsByNames.insert(str,
-                        songsByFavourites.insert(songsByFavourites.end(), str));
+    songs_by_names.insert(str,
+                        songs_by_favourites.insert(songs_by_favourites.end(), str));
   }
 
   int K;
@@ -183,8 +183,8 @@ int main() {
     if (action == 'a') {
       std::string str;
       std::cin >> str;
-      songsByNames.insert(
-          str, songsByFavourites.insert(songsByFavourites.end(), str));
+      songs_by_names.insert(
+          str, songs_by_favourites.insert(songs_by_favourites.end(), str));
       continue;
     }
     if (action == 'm') {
@@ -192,35 +192,35 @@ int main() {
       int value;
       std::cin >> str >> value;
 
-      auto song = songsByNames.at(str);
+      auto song = songs_by_names.at(str);
 
       if (value < 0) {
         auto to = std::next(song);
-        while (to != songsByFavourites.end() && value++ < 0) {
+        while (to != songs_by_favourites.end() && value++ < 0) {
           std::advance(to, 1);
         }
-        songsByFavourites.splice(to, songsByFavourites, song);
+        songs_by_favourites.splice(to, songs_by_favourites, song);
         continue;
       }
 
       auto to = song;
-      while (to != songsByFavourites.end() && value-- > 0) {
+      while (to != songs_by_favourites.end() && value-- > 0) {
         std::advance(to, -1);
       }
-      songsByFavourites.splice(to, songsByFavourites, song);
+      songs_by_favourites.splice(to, songs_by_favourites, song);
       continue;
     }
     if (action == 'r') {
       std::string str1, str2;
       std::cin >> str1 >> str2;
 
-      std::swap(*songsByNames.at(str1), *songsByNames.at(str2));
-      std::swap(songsByNames.at(str1), songsByNames.at(str2));
+      std::swap(*songs_by_names.at(str1), *songs_by_names.at(str2));
+      std::swap(songs_by_names.at(str1), songs_by_names.at(str2));
 
       continue;
     }
   }
-  for (auto& song : songsByFavourites) {
+  for (auto& song : songs_by_favourites) {
     std::cout << song << std::endl;
   }
 }

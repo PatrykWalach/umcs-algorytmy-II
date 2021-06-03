@@ -14,26 +14,26 @@
 
 #include <cmath>
 
-std::vector<int> rabinKarp(const std::vector<short>& sequence,
+std::vector<int> rabin_karp(const std::vector<short>& sequence,
                            const std::vector<short>& search) {
   const int p = 101;
   const int m = 1e9 + 9;
 
-  std::vector<long long> pPow(std::max(search.size(), sequence.size()));
-  pPow[0] = 1;
-  for (int i = 1; i < (int)pPow.size(); i++) {
-    pPow[i] = (pPow[i - 1] * p) % m;
+  std::vector<long long> p_pow(std::max(search.size(), sequence.size()));
+  p_pow[0] = 1;
+  for (int i = 1; i < (int)p_pow.size(); i++) {
+    p_pow[i] = (p_pow[i - 1] * p) % m;
   }
 
-  std::vector<long long> hashedSequence(sequence.size() + 1, 0);
+  std::vector<long long> hashed_sequence(sequence.size() + 1, 0);
   for (int i = 0; i < sequence.size(); i++) {
-    hashedSequence[i + 1] =
-        (hashedSequence[i] + (sequence[i] + 1) * pPow[i]) % m;
+    hashed_sequence[i + 1] =
+        (hashed_sequence[i] + (sequence[i] + 1) * p_pow[i]) % m;
   }
 
-  long long hashedSearch = 0;
+  long long hashed_search = 0;
   for (int i = 0; i < search.size(); i++) {
-    hashedSearch = (hashedSearch + (search[i] + 1) * pPow[i]) % m;
+    hashed_search = (hashed_search + (search[i] + 1) * p_pow[i]) % m;
   }
 
   std::vector<int> occurrences;
@@ -41,9 +41,9 @@ std::vector<int> rabinKarp(const std::vector<short>& sequence,
   for (int i = sequence.size() - search.size();
        i > -1 && occurrences.size() < 2; i--) {
     long long hash =
-        (hashedSequence[i + search.size()] + m - hashedSequence[i]) % m;
+        (hashed_sequence[i + search.size()] + m - hashed_sequence[i]) % m;
 
-    if (hash == hashedSearch * pPow[i] % m &&
+    if (hash == hashed_search * p_pow[i] % m &&
         std::equal(sequence.begin() + i, sequence.begin() + i + search.size(),
                    search.begin())) {
       occurrences.push_back(i);
@@ -80,7 +80,7 @@ int main() {
     subsequence.push_back(n);
   }
 
-  auto r = rabinKarp(sequence, subsequence);
+  auto r = rabin_karp(sequence, subsequence);
 
   int j = r[0];
   int c = r[1] + j;

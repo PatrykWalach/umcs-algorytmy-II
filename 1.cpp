@@ -78,10 +78,10 @@ int main() {
   queue.push(std::make_tuple(0, s));
 
   while (!queue.empty()) {
-    int fromDistance;
+    int from_distance;
     short from;
 
-    std::tie(fromDistance, from) = queue.top();
+    std::tie(from_distance, from) = queue.top();
     queue.pop();
 
     if (visited[from]) {
@@ -94,14 +94,14 @@ int main() {
       short to;
       std::tie(distance, to) = edge;
 
-      auto toDistance = distance + fromDistance;
+      auto to_distance = distance + from_distance;
 
-      if (toDistance >= distances[to]) {
+      if (to_distance >= distances[to]) {
         continue;
       }
 
-      distances[to] = toDistance;
-      queue.push(std::make_tuple(toDistance, to));
+      distances[to] = to_distance;
+      queue.push(std::make_tuple(to_distance, to));
     }
   }
   std::cout << distances[d];

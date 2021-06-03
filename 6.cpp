@@ -23,7 +23,7 @@ double angle(Point &a, Point &b, Point &c) {
   return a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y);
 }
 
-void convexHull(std::vector<Point> &points) {
+void convex_hull(std::vector<Point> &points) {
   std::sort(points.begin(), points.end());
   auto &first = points.front();
   auto &last = points.back();
@@ -82,7 +82,7 @@ int main() {
     std::cin >> points[i].x >> points[i].y;
   }
 
-  convexHull(points);
+  convex_hull(points);
 
   std::cout.precision(3);
   std::cout << std::fixed << area(points) << std::endl;
